@@ -2,6 +2,7 @@
 
 import string
 import requests
+import datetime
 from bs4 import BeautifulSoup
 from collections import Counter
 
@@ -9,6 +10,7 @@ from collections import Counter
 url = "https://news.google.com" 
 request = requests.get(url)
 html_raw = request.content
+
 
 # Make soup and find all Titles
 soup = BeautifulSoup(html_raw,'html.parser')
@@ -33,7 +35,7 @@ def writeTitlestoFile(titleList):
 writeTitlestoFile(titleList) 
    
 def stripPunctuation(titleList):
-    puncList = [".",";",":","!","?","/","\\",",","#","@","$","&",")",'"',"(","-","\""]
+    puncList = ["|",":",".",";",":","!","?","/","\\",",","#","@","$","&",")",'"',"(","-","\""]
     for punc in puncList:
         for title in titleList:
             titleList = [title.replace(punc,'') for title in titleList]
@@ -41,7 +43,6 @@ def stripPunctuation(titleList):
 
 titleList = stripPunctuation(titleList)
 
-# Returns a list of all of the words in titleList.
 def splitStrings(titleList):
     wordList = []
     for title in range(len(titleList)):
@@ -50,7 +51,6 @@ def splitStrings(titleList):
     return wordList
 
 wordList = splitStrings(titleList)
-
 
 def countWords(wordList):
     c = Counter()
@@ -61,6 +61,12 @@ def countWords(wordList):
 
 counter = countWords(wordList)
 
-f = open('temp.txt', 'w')
+def writeCountertoFile(counter):
+    now = datetime.datetime.now()
+    with open('countofwords-%s.txt' % now.strftime("%Y-%m-%d %H:%M"), 'w') as f:
+        for word, count in counter.most_common():
+            print("%s:%d" % (word, count), file=f)
 
- 
+writeCountertoFile(counter) 
+
+
